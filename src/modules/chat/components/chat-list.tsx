@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FC } from 'react';
-import { headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { ChatRow } from '@stn-ui/chat-row';
 import { Heading } from '@stn-ui/heading';
@@ -9,11 +9,16 @@ import { ChatListActions } from './chat-list-actions';
 import styles from './chat-list.module.scss';
 
 export const ChatList: FC = async () => {
+  const getCookieHeader = (): string =>
+    cookies()
+      .getAll()
+      .map(({ name, value }) => `${name}=${value}`)
+      .join(';');
   const chatsPromise = await fetch(`${process.env.APP_HOST}/api/chats`, {
-    headers: headers(),
+    headers: { Cookie: getCookieHeader() },
   }).then((res) => res.json() ?? []);
   const categoriesPromise = await fetch(`${process.env.APP_HOST}/api/categories`, {
-    headers: headers(),
+    headers: { Cookie: getCookieHeader() },
   }).then((res) => res.json());
 
   const [chats, categories] = await Promise.all([chatsPromise, categoriesPromise]);
